@@ -1,11 +1,7 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
-  </head>
-  <body>
+{% extends "layout.html" %}
+
+  {% block body %}
+    <div class="login ">
     <h1>Welcome to the Register page!</h1>
     {% with messages=get_flashed_messages()%} {% if messages %}
     <div>
@@ -13,7 +9,7 @@
       <div>{{message}}</div>
       {%endfor%}
     </div>
-    {%endif%} {%endwith%}
+    {% endif %} {% endwith %}
     <form method="POST">
       {{form.hidden_tag()}}
       <div>{{form.username.label}} {{form.username}}</div>
@@ -25,5 +21,5 @@
         <a href="{{url_for('login')}}">here!</a>
       </h5>
     </form>
-  </body>
-</html>
+  </div>
+  {% endblock %}

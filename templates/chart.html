@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block title %}Saved Tickers{% endblock %}
+
+{% block body %}
+<script src="{{ url_for('static', filename='js/lightweight-charts.standalone.production.js') }}"></script>
+<script src="{{ url_for('static', filename='js/trend-line.js') }}"></script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 5px;
+    }
+
+    .chart-wrapper {
+        /* margin: 20px 0; */
+        border: 1px solid #ddd;
+        /* padding: 10px; */
+        border-radius: 5px;
+        overflow: hidden;
+        display: flex;
+        direction: column;
+    }
+
+    .controls {
+        /* margin: 20px 0; */
+    }
+</style>
+<!-- Load our custom component -->
+<script src="{{ url_for('static', filename='js/candlestick-chart.js') }}"></script>
+
+<div class="chart-wrapper">
+    <div class="drawing-tools">
+        <button id="draw-line" onclick="setDrawingMode('line')">Line</button>
+        <button id="draw-rect" onclick="swing()">Swings</button>
+        <button id="draw-circle " onclick="BOS()">BOS</button>
+        <button id="draw-gap " onclick="Gap()">Gap</button>
+        <button id="clear-drawings">Clear</button>
+    </div>
+    <candlestick-chart id="chart" theme="light" up-color="#089981" down-color="#f23645" data='{{ data | tojson | safe}}'
+        symbol="{{ symbol }}">
+    </candlestick-chart>
+
+
+</div>
+
+<script>
+    // // Your JavaScript functions remain the same
+    function toggleTheme() {
+        const chart = document.getElementById('myChart');
+        const currentTheme = chart.getAttribute('theme');
+        chart.setAttribute('theme', currentTheme === 'light' ? 'dark' : 'light');
+    }
+
+    function swing() {
+        const chart = document.getElementById('chart');
+        chart.postSwingData().then(data => {
+            console.log("Received data:", data);
+            const swingHighMarkers = data['swingHigh'].map((swing, index) => ({
+                time: swing.time,
+                direction: 'up',
+                shape: 'arrowDown',
+                id: index,
+                isBull: true
+
+            }));
+            // console.log(swingHighMarkers)
+            chart.plotCandlestickMarkers(swingHighMarkers)
+
+            const swingLowMarkers = data['swingLow'].map((swing, index) => ({
+                time: swing.time,
+                direction: 'down',
+                shape: 'arrowUp',
+                id: index,
+                isBull: false
+
+            }));
+            // console.log(swingHighMarkers)
+            chart.plotCandlestickMarkers(swingLowMarkers)
+            // return data
+            // Do something with the data
+        })
+            .catch(error => {
+                console.error("Failed to get data:", error);
+            });
+        // const swingHighs = swings[]
+    }
+
+    function BOS() {
+        const chart = document.getElementById('chart');
+        chart.postBOSData().then(data => {
+            chart.plotBOS(data.breakHigh,true)
+            chart.plotBOS(data.breakLow,false)
+            return
+        })
+            .catch(error => {
+                console.error("Failed to get data:", error);
+            });
+        // const swingHighs = swings[]
+    }
+
+    function Gap() {
+        const chart = document.getElementById('chart');
+        chart.postGapData().then(data => {
+            console.log("Received data:", data.gap);
+            chart.plotGap(data.gap)
+            return
+        })
+            .catch(error => {
+                console.error("Failed to get data:", error);
+            });
+    }
+
+    function setDrawingMode(mode) {
+        const buttons = document.querySelectorAll('.drawing-tools button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if (mode) {
+            const activeBtn = document.getElementById(`draw-${mode}`);
+            activeBtn.classList.add('active');
+        }
+        const chart = document.getElementById('chart');
+        console.log("parent", mode)
+        chart.setDrawingMode(mode)
+    }
+</script>
+
+{% endblock %}

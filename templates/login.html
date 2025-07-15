@@ -1,28 +1,25 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
-  </head>
-  <body>
-    <h1>Welcome to the Login page.</h1>
-    {% with messages=get_flashed_messages()%} {% if messages %}
-    <div>
-      {% for message in messages %}
-      <div>{{message}}</div>
-      {%endfor%}
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="login ">
+      <h1>Welcome to the Login page.</h1>
+      {% with messages=get_flashed_messages()%} {% if messages %}
+      <div>
+        {% for message in messages %}
+        <div>{{message}}</div>
+        {%endfor%}
+      </div>
+      {%endif%} {%endwith%}
+      <form method="POST">
+        {{form.hidden_tag()}}
+        <div>{{form.username.label}} {{form.username}}</div>
+        <div>{{form.password.label}} {{form.password}}</div>
+        <div>{{form.submit()}}</div>
+        <h5>
+          Dont have an acount? Register
+          <a href="{{url_for('register')}}">here!</a>
+        </h5>
+        
+      </form>
     </div>
-    {%endif%} {%endwith%}
-    <form method="POST">
-      {{form.hidden_tag()}}
-      <div>{{form.username.label}} {{form.username}}</div>
-      <div>{{form.password.label}} {{form.password}}</div>
-      <div>{{form.submit()}}</div>
-      <h5>
-        Dont have an acount? Register
-        <a href="{{url_for('register')}}">here!</a>
-      </h5>
-    </form>
-  </body>
-</html>
+{% endblock %}

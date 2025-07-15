@@ -1,0 +1,43 @@
+<div>
+  <h2>{{ symbol }}</h2>
+  <h4>{{ name }}</h4>
+  <div>
+    <h2>{{ symbol }}</h2>
+    <h4>{{ name }}</h4>
+    <form onsubmit="return handleFormSubmit(event)">
+      <!-- Hidden inputs for symbol and name -->
+      <input type="hidden" name="symbol" value="{{ symbol }}">
+      <input type="hidden" name="name" value="{{ name }}">
+  
+      <div id="period-buttons">
+        <label><input type="radio" name="period" value="1M" checked onchange="updateStartDate()"> 1M</label>
+        <label><input type="radio" name="period" value="W1" onchange="updateStartDate()"> W1</label>
+        <label><input type="radio" name="period" value="D" onchange="updateStartDate()"> D</label>
+        <label><input type="radio" name="period" value="Custom" onchange="updateStartDate()"> Custom</label>
+      </div>
+      <div style="margin-top: 10px;">
+        <label>
+          <input type="checkbox" id="isCurrent" name="isCurrent" onchange="toggleEndDate()">
+          Is Current
+        </label>
+      </div>
+      <div style="margin-top: 10px;">
+        <label for="startDate">Start Date:
+        <input type="date" id="startDate" name="startDate">
+      </label>
+      </div>
+      <div style="margin-top: 10px;">
+        <label for="endDate">End Date:
+        <input type="date" id="endDate" name="endDate">
+      </label>
+      </div>
+      <div style="margin-top: 20px;">
+        <button type="submit">Submit</button>
+        <button type="button" onclick="closeModal()">Close</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+

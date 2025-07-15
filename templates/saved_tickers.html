@@ -1,0 +1,180 @@
+{% extends "layout.html" %}
+
+{% block title %}Saved Tickers{% endblock %}
+
+{% block body %}
+<div>
+  <h1>Saved Ticker Data</h1>
+
+{% for exchange, records in grouped_records.items() %}
+<h2>{{ exchange }}</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Symbol</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for record in records %}
+    <tr id="record-{{ record.id }}" ondblclick="openModal(event, '{{ record.symbol }}', '{{ record.name }}')">
+      <td>{{ record.symbol }}</td>
+      <td>{{ record.name }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+
+<a href="{{ url_for('home') }}">
+  <button>Back to Home</button>
+</a>
+
+<!-- Modal -->
+<div id="tickerModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <div id="modal-body">
+      <!-- Form content will be loaded here -->
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+<script>
+  // Make closeModal globally accessible
+  window.closeModal = function () {
+    // Hide the modal
+    document.getElementById('tickerModal').style.display = 'none';
+  };
+
+  function openModal(event, symbol, name) {
+    // Prevent the default double-click behavior
+    event.preventDefault();
+
+    // Show the modal and display a loading message
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = '<p>Loading...</p>';
+    document.getElementById('tickerModal').style.display = 'block';
+
+    // Make an AJAX call to fetch the form
+    fetch('/tickDataForm', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ symbol: symbol, name: name }),
+    })
+      .then(response => response.text())
+      .then(html => {
+        // Replace the loading message with the fetched form
+        modalBody.innerHTML = html;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        modalBody.innerHTML = '<p>Failed to load data. Please try again.</p>';
+      });
+  }
+</script>
+<script>
+  function toggleEndDate() {
+    const isCurrentCheckbox = document.getElementById('isCurrent');
+    const endDateInput = document.getElementById('endDate');
+
+    if (isCurrentCheckbox.checked) {
+      const now = new Date();
+      const formattedDate = now.toISOString().slice(0, 10); // Format as yyyy-MM-ddTHH:mm
+      endDateInput.value = formattedDate;
+      endDateInput.disabled = true;
+    } else {
+      endDateInput.disabled = false;
+      endDateInput.value = ''; // Clear the value
+    }
+
+    console.log("End Date:", endDateInput.value); // Debugging log
+    updateStartDate();
+  }
+
+  function updateStartDate() {
+    const periodButtons = document.getElementsByName('period');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    // Get the selected period
+    let selectedPeriod = null;
+    for (const button of periodButtons) {
+      if (button.checked) {
+        selectedPeriod = button.value;
+        break;
+      }
+    }
+
+    // Ensure endDate has a valid value
+    if (!endDateInput.value) {
+      console.error("End date is not set.");
+      return;
+    }
+
+    // Enable or disable the start date based on the selected period
+    if (selectedPeriod === 'Custom') {
+      startDateInput.disabled = false;
+      startDateInput.value = ''; // Clear the value for custom input
+    } else {
+      startDateInput.disabled = true;
+
+      // Calculate the start date based on the selected period
+      const endDate = new Date(endDateInput.value);
+      let startDate = new Date(endDate);
+
+      if (selectedPeriod === '1M') {
+        startDate.setMonth(endDate.getMonth() - 1);
+      } else if (selectedPeriod === 'W1') {
+        startDate.setDate(endDate.getDate() - 7);
+      } else if (selectedPeriod === 'D') {
+        startDate.setDate(endDate.getDate() - 1);
+      }
+
+      // Format the start date and set it
+      const formattedStartDate = startDate.toISOString().slice(0, 10); // Format as yyyy-MM-ddTHH:mm
+      startDateInput.value = formattedStartDate;
+    }
+
+    console.log("Start Date:", startDateInput.value); // Debugging log
+  }
+
+  // Initialize the start date when the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    toggleEndDate();
+  });
+</script>
+<script>
+  function handleFormSubmit(event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // Get form data
+    const symbol = document.querySelector('input[name="symbol"]').value;
+    const name = document.querySelector('input[name="name"]').value;
+    const period = document.querySelector('input[name="period"]:checked').value;
+    const isCurrent = document.getElementById('isCurrent').checked;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    // Construct the query string from your data
+    const params = new URLSearchParams({
+      symbol: symbol,
+      name: name,
+      period: period,
+      isCurrent: isCurrent,
+      startDate: startDate,
+      endDate: endDate
+    });
+    window.location.href = `/chart?${params.toString()}`;
+
+    // Optionally, you can also close the modal here
+    closeModal();
+  }
+</script>
+{% endblock %}
