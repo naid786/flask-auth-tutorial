@@ -1,18 +1,66 @@
-# Virtual environment
+# Python virtual environments
 venv/
 ENV/
+.env/
+.venv/
+.python-version
 
-# IDE specific files
+# Flask / local config
+instance/
+*.sqlite3
+*.db
+*.db-journal
+.flaskenv
+
+# Environment secrets
+.env.local
+.env.*
+
+# IDE / Editor
 .idea/
 .vscode/
 *.swp
 *.swo
-*.csv
-*.log
 
-# Python cache and build files
+# OS files
+.DS_Store
+
+# Logs / data (uncomment if you really want to keep CSVs ignored)
+*.log
+# *.csv
+
+# Python cache / build
 __pycache__/
 *.py[cod]
 *.egg-info/
 dist/
 build/
+pip-wheel-metadata/
+*.egg
+.eggs/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Type checking / lint caches
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+
+# Tox
+.tox/
+
+# Packaging / locking (uncomment if using and want ignored)
+# poetry.lock
+# Pipfile.lock
+
+# Misc
+*.bak
+*.orig
+
+*.csv
